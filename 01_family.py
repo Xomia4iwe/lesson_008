@@ -43,6 +43,10 @@ from random import randint
 # Подвести итоги жизни за год: сколько было заработано денег, сколько сьедено еды, сколько куплено шуб.
 
 
+from termcolor import cprint
+from random import randint
+
+
 class House:
 
     def __init__(self):
@@ -69,8 +73,8 @@ class Human:
 
     def eat(self):
         if self.house.food >= 20:
-            self.fullness += 20
-            self.house.food -= 20
+            self.fullness += 30
+            self.house.food -= 30
             print('{} поел 20 еды!'.format(self.name))
         else:
             print('В Холодильнике кончилась еда!!!!')
@@ -86,13 +90,6 @@ class Human:
         else:
             print('{} рад(а), что чисто!'.format(self.name))
 
-    def clean_house(self):
-        if self.house.mess > 100:
-            self.happiness -= 10
-            print('Пора провести уборку в доме!')
-        else:
-            print('В доме еще достаточно чисто!')
-
     def alive(self):
         if self.fullness <= 0 or self.happiness < 0:
             print('{} умер'.format(self.name))
@@ -106,7 +103,8 @@ class Husband(Human):
         super().__init__(name)
 
     def act(self):
-        super().clean_house()
+        # cube = randint(1, 2)
+        super().cleaning_house()
         if not super().alive():
             if self.fullness < 20:
                 self.eat()
@@ -114,8 +112,10 @@ class Husband(Human):
                 self.gaming()
             elif self.house.money <= 200:
                 self.work()
-            else:
-                self.work()
+            # elif cube == 1:
+            #     self.gaming()
+            # else:
+            #     self.work()
             return True
         else:
             return False
@@ -129,7 +129,9 @@ class Husband(Human):
 
     def gaming(self):
         self.fullness -= 10
-        self.happiness += 40
+        self.happiness += 20
+        if self.happiness > 100:
+            self.happiness = 100
         print('{} целый день играл в WoT!'.format(self.name) if self.fullness > 0
               else '{} умер, но победил в WoT !'.format(self.name))
 
@@ -151,7 +153,7 @@ class Wife(Human):
                 self.shopping()
             elif 50 < self.house.mess:
                 self.clean_house()
-            elif self.house.mess < 30:
+            elif self.happiness <= 30 and self.house.money >= 350:
                 self.buy_fur_coat()
             return True
         else:
@@ -171,7 +173,7 @@ class Wife(Human):
 
     def clean_house(self):
         self.fullness -= 10
-        self.happiness -= 30
+        self.happiness -= 5
         self.house.mess -= 100
         if self.house.mess < 0:
             self.house.mess = 0
@@ -184,6 +186,8 @@ class Wife(Human):
             self.happiness += 60
             self.number_fur_coats += 1
             self.house.money -= 350
+            if self.happiness > 100:
+                self.happiness = 100
             print('{} купила шубу!'.format(self.name))
         else:
             print('{} хотела купить шубу, но денег в доме не хватает!'.format(self.name))
