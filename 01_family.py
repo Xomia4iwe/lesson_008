@@ -3,6 +3,7 @@
 from termcolor import cprint
 from random import randint
 
+
 ######################################################## Часть первая
 #
 # Создать модель жизни небольшой семьи.
@@ -52,11 +53,11 @@ class House:
         self.money = 100
         self.food = 50
         self.mess = 0
+        self.cat_food = 30
 
     def __str__(self):
-        return '{}:В доме еды осталось {}, денег осталось {}. Беспорядка в доме {}'.format(self.__class__.__name__,
-                                                                                           self.food, self.money,
-                                                                                           self.mess)
+        return '{}:В доме еды осталось {}, денег осталось {}. Беспорядка в доме {}, еды для кота {}'.format(
+            self.__class__.__name__, self.food, self.money, self.mess, self.cat_food)
 
 
 class Human:
@@ -77,6 +78,13 @@ class Human:
             print('{} поел 20 еды!'.format(self.name))
         else:
             print('В Холодильнике кончилась еда!!!!')
+
+    def pet_a_cat(self):
+        self.happiness += 5
+        self.fullness -= 10
+        if self.happiness > 100:
+            self.happiness = 100
+        print('{} погладил кота!'.format(self.name))
 
     def go_to_house(self, house):
         self.house = house
@@ -102,19 +110,17 @@ class Husband(Human):
         super().__init__(name)
 
     def act(self):
-        cube = randint(1, 2)
+        monet = randint(1, 3)
         super().cleaning_house()
         if not super().alive():
             if self.fullness < 20:
                 self.eat()
-            elif self.happiness <= 20:
-                self.gaming()
             elif self.house.money <= 200:
                 self.work()
-            elif cube == 1:
+            elif self.happiness <= 20 and monet == 1:
                 self.gaming()
-            else:
-                self.work()
+            elif self.happiness <= 20 and monet == 2 or 3:
+                self.pet_a_cat()
             return True
         else:
             return False
@@ -146,21 +152,31 @@ class Wife(Human):
         if not super().alive():
             if self.fullness <= 10 and self.house.food > 0:
                 self.eat()
-            elif self.happiness <= 10 and self.house.mess >= 70:
-                self.clean_house()
             elif self.house.food <= 30:
                 self.shopping()
+            elif self.happiness <= 10 and self.house.mess >= 70:
+                self.clean_house()
+            elif self.house.cat_food <= 20:
+                self.buy_cat_food()
             elif 50 < self.house.mess:
                 self.clean_house()
             elif self.happiness <= 30 and self.house.money >= 350:
                 self.buy_fur_coat()
+            elif self.happiness <= 20:
+                self.pet_a_cat()
             return True
         else:
             return False
 
+    def buy_cat_food(self):
+        self.fullness -= 10
+        self.house.money -= 20
+        self.house.cat_food += 20
+        print('{} купила 20 еды коту!'.format(self.name))
+
     def shopping(self):
         self.fullness -= 10
-        if self.house.money >= 60:
+        if self.house.money >= 40:
             self.house.money -= 60
             self.house.food += 60
             print('{} купила 60 еды!'.format(self.name))
@@ -190,6 +206,51 @@ class Wife(Human):
             print('{} купила шубу!'.format(self.name))
         else:
             print('{} хотела купить шубу, но денег в доме не хватает!'.format(self.name))
+
+
+class Cat:
+    def __init__(self, name=None):
+        self.name = name
+        self.fullness = 30
+        self.house = None
+
+    def __str__(self):
+        return 'У {}, степень сытости {},'.format(self.name, self.fullness)
+
+    def go_to_house(self, house):
+        self.house = house
+        print('Кота {} принесли в дом!'.format(self.name))
+
+    def act(self):
+        if self.fullness <= 0:
+            cprint('{} умер...'.format(self.name), color='red')
+            return
+        dice = randint(1, 3)
+        if self.fullness <= 10:
+            self.eat()
+        elif dice == 1:
+            self.eat()
+        elif dice == 2:
+            self.sleep()
+        else:
+            self.soil()
+
+    def eat(self):
+        if self.house.cat_food >= 10:
+            self.fullness += 20
+            self.house.cat_food -= 10
+            cprint('Кот {} поел'.format(self.name), color='yellow')
+        else:
+            cprint('У кота {} нет еды'.format(self.name), color='red')
+
+    def sleep(self):
+        self.fullness -= 10
+        cprint('Кот {} спал целый день'.format(self.name), color='green')
+
+    def soil(self):
+        self.fullness -= 10
+        self.house.mess += 5
+        cprint('Кот {} рвал обои'.format(self.name), color='green')
 
 
 class Child(Human):
@@ -227,15 +288,19 @@ class Child(Human):
 home = House()
 serge = Husband(name='Сережа')
 masha = Wife(name='Маша')
+murzik = Cat(name='Мурзик')
 kolya = Child(name='Коля')
 serge.go_to_house(home)
 masha.go_to_house(home)
+murzik.go_to_house(home)
+for day in range(1, 365):
 kolya.go_to_house(home)
 for day in range(1, 365):
     cprint('================== День {} =================='.format(day), color='red')
     home.mess += 5
     serge.act()
     masha.act()
+    murzik.act()
     kolya.act()
     cprint(serge, color='cyan')
     cprint(masha, color='cyan')
