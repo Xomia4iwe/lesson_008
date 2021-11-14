@@ -3,7 +3,6 @@
 from termcolor import cprint
 from random import randint
 
-
 ######################################################## Часть первая
 #
 # Создать модель жизни небольшой семьи.
@@ -115,8 +114,10 @@ class Husband(Human):
         if not super().alive():
             if self.fullness < 20:
                 self.eat()
-            elif self.house.money <= 200:
+            elif self.house.money <= 100:
                 self.work()
+            elif self.happiness <= 50:
+                self.gaming()
             elif self.happiness <= 20 and monet == 1:
                 self.gaming()
             elif self.happiness <= 20 and monet == 2 or 3:
@@ -152,7 +153,7 @@ class Wife(Human):
         if not super().alive():
             if self.fullness <= 10 and self.house.food > 0:
                 self.eat()
-            elif self.house.food <= 30:
+            elif self.house.food <= 60:
                 self.shopping()
             elif self.happiness <= 10 and self.house.mess >= 70:
                 self.clean_house()
@@ -176,7 +177,7 @@ class Wife(Human):
 
     def shopping(self):
         self.fullness -= 10
-        if self.house.money >= 40:
+        if self.house.money >= 60:
             self.house.money -= 60
             self.house.food += 60
             print('{} купила 60 еды!'.format(self.name))
@@ -293,8 +294,8 @@ kolya = Child(name='Коля')
 serge.go_to_house(home)
 masha.go_to_house(home)
 murzik.go_to_house(home)
-for day in range(1, 365):
 kolya.go_to_house(home)
+
 for day in range(1, 365):
     cprint('================== День {} =================='.format(day), color='red')
     home.mess += 5
@@ -307,9 +308,6 @@ for day in range(1, 365):
     cprint(kolya, color='cyan')
     cprint(home, color='cyan')
     print('Жена купила ', masha.number_fur_coats, ' шуб')
-
-
-
 
 ######################################################## Часть третья
 #
